@@ -146,9 +146,18 @@ pip3 install --upgrade openai
 
 ### 2.个人微信
 
-与项目 [chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat) 的使用方式相同，目前接入个人微信可能导致账号被限制，暂时不建议使用。
+与项目 [chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat) 的使用方式相似。
 
-配置项说明：
+**安装依赖：**
+
+```bash
+pip3 install itchat-uos==1.5.0.dev0
+pip3 install --upgrade openai
+```
+注：`itchat-uos`使用指定版本1.5.0.dev0，`openai`使用最新版本，需高于0.27.0。
+
+
+**配置项说明：**
 
 ```bash
 "channel": {
@@ -292,7 +301,9 @@ python3 app.py    # 此时会监听8080端口
 cd channel/qq
 ./go-cqhttp
 ```
-注意：目前未设置任何 关键词匹配 及 群聊白名单，对所有私聊均会自动回复，在群聊中只要被@也会自动回复。
+注意：
++ 目前未设置任何 关键词匹配 及 群聊白名单，对所有私聊均会自动回复，在群聊中只要被@也会自动回复。
++ 如果出现 账号被冻结 等异常提示，可将 go-cqhttp 同目录下的 device.json 文件中`protocol`的值由5改为2，参考该[Issue](https://github.com/Mrs4s/go-cqhttp/issues/1942)。
 
 
 ### 6.Telegram
@@ -341,14 +352,14 @@ Follow [官方文档](https://support.google.com/mail/answer/185833?hl=en) to cr
 
 ### 8.Slack
 
-**需要：** 服务器、 Slack 应用
+**❉不再需要服务器以及公网 IP**
 
-**Contributor:** [amao](https://github.com/amaoo)
+**Contributor:** [amaoo](https://github.com/amaoo)
 
 **依赖**
 
 ```bash
-pip3 install slack_bolt flask
+pip3 install slack_bolt
 ```
 
 **配置**
@@ -358,37 +369,35 @@ pip3 install slack_bolt flask
     "type": "slack",
     "slack": {
       "slack_bot_token": "xoxb-xxxx",
-      "slack_signing_secret": "xxxx"
+      "slack_app_token": "xapp-xxxx"
     }
   }
 ```
 
-需要 80 端口,可以在 **channel/slack/slack_channel.py:45** 修改相应端口
+**设置机器人令牌范围 - OAuth & Permission**
 
-将范围设置为机器人令牌范围 OAuth & Permission:
+将 Bot User OAuth Token 写入配置文件 slack_bot_token
 
 ```
 app_mentions:read
-channels:join
 chat:write
-im:history
-im:read
-im:writ
 ```
 
-在事件订阅中设置范围 - Subscribe to bot events
+
+**开启 Socket 模式 - Socket Mode**
+
+如未创建应用级令牌，会提示创建
+将创建的 token 写入配置文件 slack_app_token
+
+
+**事件订阅(Event Subscriptions) - Subscribe to bot events**
 
 ```
 app_mention
 ```
 
-订阅 URL，如果端口是 80 ，可不填
 
-```
-http:/你的固定公网ip或者域名:端口/slack/events
-```
-
-参考文档
+**参考文档**
 
 ```
 https://slack.dev/bolt-python/tutorial/getting-started

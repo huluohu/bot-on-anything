@@ -1,27 +1,17 @@
-import json
 import re
-from flask import Flask, request, Response
 from slack_bolt import App
-from slack_bolt.async_app import AsyncApp
-from slack_bolt.adapter.flask import SlackRequestHandler
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from common import const
 from common.log import logger
 from channel.channel import Channel
 from config import channel_conf
 
-# 创建 Flask 实例
-flask_app = Flask(__name__)
-
 # 创建 Slack Bolt 实例
-app = App(token=channel_conf(const.SLACK).get('slack_bot_token'),
-          signing_secret=channel_conf(const.SLACK).get('slack_signing_secret'))
+app = App(token=channel_conf(const.SLACK).get('slack_bot_token'))
 
-# 创建 SlackRequestHandler 实例
-# handler = SlackRequestHandler(app)
+# 创建 SocketModeHandler 实例
 handler = SocketModeHandler(app=app,
                             app_token=channel_conf(const.SLACK).get('slack_app_token'))
-
 
 # 监听 Slack app_mention 事件
 @app.event("app_mention")
@@ -59,7 +49,6 @@ def slack_events():
 
 class SlackChannel(Channel):
     def startup(self):
-        # flask_app.run(host='0.0.0.0', port=8088)
         handler.start()
 
     def handle(self, event):
